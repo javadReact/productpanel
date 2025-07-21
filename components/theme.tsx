@@ -30,7 +30,7 @@ export const theme = createTheme({
         borderRadius: 8,
     },
     typography: {
-        fontFamily: "'Roboto', 'Arial', sans-serif",
+        fontFamily: "'Peyda', 'Arial', sans-serif",
     },
 });
 
