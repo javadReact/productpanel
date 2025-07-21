@@ -53,10 +53,9 @@ export default function AddProductForm() {
             setPrice("");
             setSuccessMessage("محصول با موفقیت ذخیره شد!");
 
-            // بعد از 2 ثانیه به صفحه اصلی برگرد
             setTimeout(() => {
                 router.push("/");
-            }, 2000);
+            }, 1000);
 
         } catch (err: any) {
             setError(err.message || "خطای ناشناخته");

@@ -10,7 +10,6 @@ async function readProducts() {
         const data = await fs.readFile(filePath, 'utf-8');
         return JSON.parse(data);
     } catch (err) {
-        // اگر فایل وجود نداشت، آرایه خالی برگردان
         if ((err as any).code === 'ENOENT') {
             return [];
         }
@@ -20,7 +19,6 @@ async function readProducts() {
 
 async function writeProducts(products: any[]) {
     try {
-        // اگر پوشه وجود نداشت، بسازش
         await fs.mkdir(fileDir, { recursive: true });
         await fs.writeFile(filePath, JSON.stringify(products, null, 2));
     } catch (err) {
