@@ -5,8 +5,7 @@ import type {Metadata} from "next";
 import {ThemeProvider} from "@mui/material/styles";
 import {theme} from "@/components/theme";
 import "./globals.css";
-
-
+import {ProductProvider} from "@/components/contexts/ProductContext";
 
 const peyda = localFont({
     src: './fonts/Peyda-Black.ttf',
@@ -27,7 +26,9 @@ export default function RootLayout({
     <html lang="fa" dir="rtl" className={`${peyda.variable}`}>
       <body>
       <ThemeProvider theme={theme}>
-        {children}
+          <ProductProvider>
+              {children}
+          </ProductProvider>
       </ThemeProvider>
       </body>
     </html>

@@ -5,6 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import {Button, Divider, IconButton, InputBase, Paper, TextField} from "@mui/material";
 import styles from "./page.module.css";
+import DataTable from "@/components/table/page";
 
 export default function Home() {
   return (
@@ -41,6 +42,8 @@ export default function Home() {
                 </Box>
             </Toolbar>
           </AppBar>
+
+            <DataTable />
         </Box>
       </>
   );
