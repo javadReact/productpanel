@@ -1,7 +1,7 @@
 import React from 'react';
 import AddProductForm from "@/components/addProductForm/page";
 
-const Page = () => {
+const AddProduct = () => {
     return (
         <>
             <AddProductForm />
@@ -9,4 +9,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default AddProduct;

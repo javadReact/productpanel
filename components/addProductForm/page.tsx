@@ -1,12 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { TextField, Button, Box, Typography } from "@mui/material";
-import { useProductContext } from "../contexts/ProductContext";
+import {
+    Box,
+    Typography,
+    Paper,
+    TextField,
+    Button,
+    Divider,
+    Alert,
+    CircularProgress,
+    Stack,
+    FormHelperText,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useProductContext } from "../contexts/ProductContext";
 
 export default function AddProductForm() {
-    const { addProduct } = useProductContext();
+    const { addProduct, products } = useProductContext();
     const router = useRouter();
 
     const [productName, setProductName] = useState("");
@@ -16,21 +27,31 @@ export default function AddProductForm() {
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setSuccessMessage("");
+        setErrors({});
 
+        const newErrors: { [key: string]: string } = {};
         const priceNumber = parseInt(price, 10);
-        if (!productName || !price || isNaN(priceNumber) || priceNumber <= 0) {
-            setError("لطفا نام محصول و قیمت معتبر وارد کنید");
+
+        if (!productName.trim()) newErrors.productName = "این فیلد الزامی است";
+        if (!price || isNaN(priceNumber) || priceNumber <= 0)
+            newErrors.price = "لطفاً عدد معتبر وارد کنید";
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
 
         setLoading(true);
 
+        // ساخت id بر اساس آخرین id محصول در آرایه products
         const newProduct = {
-            id: Date.now(),
+            id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
             productName,
             description,
             price: priceNumber,
@@ -53,10 +74,7 @@ export default function AddProductForm() {
             setPrice("");
             setSuccessMessage("محصول با موفقیت ذخیره شد!");
 
-            setTimeout(() => {
-                router.push("/");
-            }, 1000);
-
+            setTimeout(() => router.push("/"), 1500);
         } catch (err: any) {
             setError(err.message || "خطای ناشناخته");
         } finally {
@@ -66,50 +84,131 @@ export default function AddProductForm() {
 
     return (
         <Box
-            component="form"
-            onSubmit={handleSubmit}
             sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                mb: 4,
+                maxWidth: 700,
+                mx: "auto",
+                mt: 8,
+                px: 2,
                 direction: "rtl",
                 fontFamily: "var(--font-peyda)",
+                minHeight: "100vh",
+                py: 5,
             }}
         >
-            <Typography variant="h6">افزودن محصول جدید</Typography>
+            <Paper
+                elevation={3}
+                sx={{
+                    p: 4,
+                    borderRadius: 4,
+                    backgroundColor: "#2a2a40",
+                    color: "#fff",
+                }}
+            >
+                <Typography variant="h5" fontWeight="bold" color="#90caf9" mb={2}>
+                    🛒 افزودن محصول جدید
+                </Typography>
 
-            <TextField
-                label="نام محصول"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
-                fullWidth
-                required
-            />
+                <Divider sx={{ mb: 3, borderColor: "#444" }} />
 
-            <TextField
-                label="توضیحات"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                fullWidth
-                multiline
-            />
+                <form onSubmit={handleSubmit}>
+                    <Stack spacing={3}>
+                        <TextField
+                            label="نام محصول"
+                            value={productName}
+                            onChange={(e) => setProductName(e.target.value)}
+                            fullWidth
+                            error={!!errors.productName}
+                            InputLabelProps={{ style: { color: "#bbb" } }}
+                            InputProps={{
+                                style: {
+                                    color: "#fff",
+                                    backgroundColor: "#3a3a55",
+                                    textAlign: "right",
+                                },
+                            }}
+                            inputProps={{ style: { textAlign: "right" } }}
+                        />
+                        {errors.productName && (
+                            <FormHelperText sx={{ color: "#f44336", mr: 1 }}>
+                                {errors.productName}
+                            </FormHelperText>
+                        )}
 
-            <TextField
-                label="قیمت (تومان)"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                type="number"
-                required
-                fullWidth
-            />
+                        <TextField
+                            label="توضیحات"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            multiline
+                            rows={4}
+                            fullWidth
+                            InputLabelProps={{ style: { color: "#bbb" } }}
+                            InputProps={{
+                                style: {
+                                    color: "#fff",
+                                    backgroundColor: "#3a3a55",
+                                    textAlign: "right",
+                                },
+                            }}
+                            inputProps={{ style: { textAlign: "right" } }}
+                        />
 
-            {error && <Typography color="error">{error}</Typography>}
-            {successMessage && <Typography color="success.main">{successMessage}</Typography>}
+                        <TextField
+                            label="قیمت (تومان)"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            type="text" // حذف فلش های بالا پایین با تغییر نوع به text
+                            fullWidth
+                            error={!!errors.price}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            InputLabelProps={{ style: { color: "#bbb" } }}
+                            InputProps={{
+                                style: {
+                                    color: "#fff",
+                                    backgroundColor: "#3a3a55",
+                                    textAlign: "right",
+                                },
+                            }}
+                            inputProps={{
+                                style: { textAlign: "right" },
+                                inputMode: "numeric",
+                                pattern: "[0-9]*",
+                            }}
+                        />
+                        {errors.price && (
+                            <FormHelperText sx={{ color: "#f44336", mr: 1 }}>
+                                {errors.price}
+                            </FormHelperText>
+                        )}
 
-            <Button variant="contained" color="primary" type="submit" disabled={loading}>
-                {loading ? "در حال ذخیره‌سازی..." : "افزودن محصول"}
-            </Button>
+                        {error && <Alert severity="error">{error}</Alert>}
+                        {successMessage && (
+                            <Alert severity="success">{successMessage}</Alert>
+                        )}
+
+                        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                disabled={loading}
+                                sx={{
+                                    borderRadius: 2,
+                                    px: 4,
+                                    py: 1.5,
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                {loading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                ) : (
+                                    "ذخیره محصول"
+                                )}
+                            </Button>
+                        </Box>
+                    </Stack>
+                </form>
+            </Paper>
         </Box>
     );
 }
