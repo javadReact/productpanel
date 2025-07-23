@@ -49,9 +49,8 @@ export default function AddProductForm() {
 
         setLoading(true);
 
-        // ساخت id بر اساس آخرین id محصول در آرایه products
+        // ساخت محصول جدید بدون id چون id باید در سرور ساخته شود
         const newProduct = {
-            id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
             productName,
             description,
             price: priceNumber,
@@ -67,6 +66,8 @@ export default function AddProductForm() {
             if (!res.ok) throw new Error("خطا در ذخیره‌سازی محصول");
 
             const savedProduct = await res.json();
+
+            // افزودن محصول به context
             addProduct(savedProduct);
 
             setProductName("");
@@ -156,7 +157,7 @@ export default function AddProductForm() {
                             label="قیمت (تومان)"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
-                            type="text" // حذف فلش های بالا پایین با تغییر نوع به text
+                            type="text"
                             fullWidth
                             error={!!errors.price}
                             inputMode="numeric"
@@ -182,9 +183,7 @@ export default function AddProductForm() {
                         )}
 
                         {error && <Alert severity="error">{error}</Alert>}
-                        {successMessage && (
-                            <Alert severity="success">{successMessage}</Alert>
-                        )}
+                        {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
                         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                             <Button
